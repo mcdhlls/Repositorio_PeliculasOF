@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Administrador</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #222;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: #333;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      color: #f9ca24;
+    }
+
+    .card {
+      background: #444;
+      border: 1px solid #555;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card i {
+      margin-right: 10px;
+    }
+
+    .card:hover {
+      background: #555;
+    }
+
+    button {
+      background: #e84118;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      padding: 10px 15px;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+
+    button:hover {
+      background: #c23616;
+    }
+
+    .delete-all-btn {
+      background: #e84118;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      padding: 10px 15px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .delete-all-btn:hover {
+      background: #c23616;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-film"></i> Panel de Administrador</h1>
+    <button class="delete-all-btn" id="botonEliminarTodas">Eliminar Todas las Películas</button>
+    <ul>
+      <% peliculas.forEach(pelicula => { %>
+        <li class="card">
+          <span>
+            <i class="fas fa-video"></i>
+            <strong><%= pelicula.nombre %></strong> (Año: <%= pelicula.año %>)
+          </span>
+          <div>
+            <button onclick="showEditForm('<%= pelicula._id %>')"><i class="fas fa-edit"></i></button>
+            <button onclick="deleteMovie('<%= pelicula._id %>')"><i class="fas fa-trash"></i></button>
+          </div>
+          <form id="form_<%= pelicula._id %>" class="edit-form" action="/admin/edit/<%= pelicula._id %>" method="post">
+            <input type="text" name="nombre" placeholder="Nuevo nombre">
+            <input type="number" name="año" placeholder="Nuevo año">
+            <input type="text" name="director" placeholder="Nuevo director">
+            <input type="text" name="actores" placeholder="Nuevos actores">
+            <button type="submit"><i class="fas fa-save"></i></button>
+          </form>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+  <!-- Formulario para agregar una nueva película -->
+  <div class="container">
+    <h2><i class="fas fa-plus-circle"></i> Agregar Nueva Película</h2>
+    <form action="/usuario/agregar" method="post">
+      <input type="text" name="nombre" placeholder="Nombre" required>
+      <input type="number" name="año" placeholder="Año" required>
+      <input type="text" name="director" placeholder="Director" required>
+      <input type="text" name="actores" placeholder="Actores separados por coma" required>
+      <button type="submit">Agregar</button>
+    </form>
+  </div>
+  <script>
+    function showEditForm(id) {
+      const form = document.getElementById('form_' + id);
+      form.style.display = form.style.display === 'block' ? 'none' : 'block';
+    }
+    
+    
+    function deleteMovie(id) {
+  fetch(`/admin/delete/${id}`, {
+    method: 'POST'
+  })
+  .then(response => {
+    if (response.ok) {
+      console.log('Película eliminada correctamente');
+      return response.text();
+    } else {
+      throw new Error('Hubo un problema al eliminar la película');
+    }
+  })
+  .then(textoDeRespuesta => {
+    // Puedes realizar alguna acción adicional si es necesario
+    window.location.reload(); // Recargar la página después de eliminar la película
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+    document.getElementById('botonEliminarTodas').addEventListener('click', function() {
+      fetch('/admin/delete-all', {
+        method: 'GET', 
+      })
+      .then(response => {
+        if (response.ok) {
+          console.log('Todas las películas fueron eliminadas con éxito');
+          return response.text();
+        } else {
+          throw new Error('Hubo un problema al eliminar las películas');
+        }
+      })
+      .then(textoDeRespuesta => {
+        window.location.reload();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    });
+  </script>
+</body>
+</html>

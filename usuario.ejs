@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Usuario</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      color: #333;
+    }
+
+    .card {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card i {
+      margin-right: 10px;
+    }
+
+    .card form {
+      display: none;
+    }
+
+    .card:hover {
+      background: #f0f0f0;
+    }
+
+    button {
+      background: #5cb85c;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4cae4c;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-film"></i> Panel de Usuario</h1>
+    <ul>
+      <% peliculas.forEach(pelicula => { %>
+        <li class="card">
+          <span>
+            <i class="fas fa-video"></i>
+            <strong><%= pelicula.nombre %></strong> (Año: <%= pelicula.año %>)
+          </span>
+          <div>
+            <button onclick="showEditForm('<%= pelicula._id %>')"><i class="fas fa-edit"></i> Editar</button>
+            <button onclick="sendDeleteRequest('<%= pelicula._id %>')"><i class="fas fa-trash"></i> Eliminar</button>
+          </div>
+          <!-- Formulario de edición para cada película -->
+          <form id="form_<%= pelicula._id %>" class="edit-form" action="/usuario/edit/<%= pelicula._id %>" method="post" style="display: none;">
+            <input type="text" name="nombre" placeholder="Nuevo nombre">
+            <input type="number" name="año" placeholder="Nuevo año">
+            <input type="text" name="director" placeholder="Nuevo director">
+            <input type="text" name="actores" placeholder="Nuevos actores">
+            <button type="submit"><i class="fas fa-save"></i> Guardar</button>
+          </form>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+  <!-- Formulario para agregar una nueva película -->
+  <div class="container">
+    <h2><i class="fas fa-plus-circle"></i> Agregar Nueva Película</h2>
+    <form action="/usuario/agregar" method="post">
+      <input type="text" name="nombre" placeholder="Nombre" required>
+      <input type="number" name="año" placeholder="Año" required>
+      <input type="text" name="director" placeholder="Director" required>
+      <input type="text" name="actores" placeholder="Actores separados por coma" required>
+      <button type="submit">Agregar</button>
+    </form>
+  </div>
+  
+  <script>
+    // Script para mostrar/ocultar el formulario de edición y establecer valores
+    function showEditForm(id) {
+      const form = document.getElementById('form_' + id);
+      form.style.display = form.style.display === 'block' ? 'none' : 'block';
+    }
+  
+    // Función para enviar una solicitud de eliminación al administrador
+    function sendDeleteRequest(id) {
+      const confirmation = confirm('¿Estás seguro de que deseas eliminar esta película? Esta acción requerirá autorización del administrador.');
+      if (confirmation) {
+        fetch('/usuario/solicitar-eliminacion/' + id, {
+          method: 'POST',
+        })
+        .then(response => {
+          if (response.ok) {
+            console.log('Solicitud de eliminación enviada con éxito');
+            // Aquí podrías mostrar un mensaje al usuario indicando que su solicitud ha sido enviada
+          } else {
+            throw new Error('Hubo un problema al enviar la solicitud de eliminación');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

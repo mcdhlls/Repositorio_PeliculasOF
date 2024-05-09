@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cuevana 5</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-vjeN69ZIiysPObPFRXc4jkvN8Mh4GNCkYUGLH7OdC6fnXjtYS8JFh1qVpfT6zxovL4aj/3oAgnvFXx5FEB+hgw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* Estilos globales */
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #121212;
+      font-family: 'Arial', sans-serif;
+      color: white;
+    }
+
+    /* Estilos del encabezado */
+    header ul {
+      list-style: none;
+    }
+
+    header ul li {
+      display: inline-block;
+      margin: 0 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #e50914;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #f6121d;
+    }
+
+    #input {
+      padding: 10px 20px;
+      border: 2px solid #e50914;
+      background-color: transparent;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+
+    /* Estilos de las películas */
+    .contenedor-peliculas {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      gap: 10px; 
+    }
+
+    .info-pelicula {
+      display: inline-block;
+      width: 200px;
+      height: 300px;
+      background-color: #333;
+      margin: 10px;
+      border-radius: 10px;
+      padding: 10px;
+      transition: transform 0.3s;
+    }
+
+    .info-pelicula:hover {
+      transform: scale(1.05);
+      border: 2px solid #e50914;
+    }
+  </style>
+</head>
+<body>
+  <div id="contenedor">
+    <header>
+      <ul>
+        <li><a href="/login"><button id="btn_login"><i class="fas fa-user"></i> Iniciar Sesión</button></a></li>
+        <li><input type="text" id="input" placeholder="Buscar..."></li>
+        <li><button id="btn_enviar"><i class="fas fa-search"></i> Buscar</button></li>
+      </ul>
+    </header>
+    <% if (peliculas.length > 0) { %>
+      <div class="contenedor-peliculas"> 
+        <% peliculas.forEach(function(pelicula) { %>
+          <div class="info-pelicula"> 
+            <h2><%= pelicula.nombre %></h2> 
+            <img src="<%=pelicula.img %>" alt="<%= pelicula.nombre %>">
+            <p>Año: <%=pelicula.año %></p>
+            <p>Director: <%=pelicula.director%></p>
+            <p>Actores: <%=pelicula.actores %></p>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <p>No se encontraron películas para mostrar.</p>
+    <% } %>
+  </div>
+  <script>
+    async function filtrarPeliculas(texto) {
+      const response = await fetch('/api/peliculas');
+      const peliculas = await response.json();
+
+      const peliculaContainer = document.querySelector('.contenedor-peliculas');
+      peliculaContainer.innerHTML = '';
+
+      peliculas.forEach(pelicula => {
+        const titulo = pelicula.nombre.toLowerCase();
+        const detalles = `${pelicula.año} ${pelicula.director} ${pelicula.actores}`.toLowerCase();
+        if (titulo.includes(texto.toLowerCase()) || detalles.includes(texto.toLowerCase())) {
+          const infoPelicula = document.createElement('div');
+          infoPelicula.classList.add('info-pelicula');
+
+          const h2Titulo = document.createElement('h2');
+          h2Titulo.textContent = pelicula.nombre;
+
+          const img = document.createElement('img');
+          img.src = pelicula.img;
+          img.alt = pelicula.nombre;
+
+          const pAnio = document.createElement('p');
+          pAnio.textContent = `Año: ${pelicula.año}`;
+
+          const pDirector = document.createElement('p');
+          pDirector.textContent = `Director: ${pelicula.director}`;
+
+          const pActores = document.createElement('p');
+          pActores.textContent = `Actores: ${pelicula.actores}`;
+
+          infoPelicula.appendChild(h2Titulo);
+          infoPelicula.appendChild(img);
+          infoPelicula.appendChild(pAnio);
+          infoPelicula.appendChild(pDirector);
+          infoPelicula.appendChild(pActores);
+
+          peliculaContainer.appendChild(infoPelicula);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const imgUrls = [
+        'https://media.revistagq.com/photos/646b368d4c1636d5edee1ae6/3:2/w_1620,h_1080,c_limit/Oppenheimer-christopher-nolan-duracion.jpg',
+        'https://image.tmdb.org/t/p/original/vWGU6zCdFo3PfUkfnfMpd6SufKg.jpg',
+        'https://occ-0-2794-2219.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABUEmC85CClo_44LpUi9jEhorbFQVr7lfrbyA50GPWu4FOr3ExvJh121HvW8yZCiSxo-M2GKGLTwYS1KtwQCT5AX49tT4qU1b9Sai.jpg?r=6b3',
+        'https://images-2.rakuten.tv/storage/snapshot/shot/c630ce36-242b-48ac-b6db-217c94e1b114-snapshot-1590667253.jpeg'
+      ];
+
+      let imgIndex = 0;
+      const imgCount = imgUrls.length;
+      const contenedor = document.getElementById('contenedor');
+
+      function cambiarImagen() {
+        contenedor.style.backgroundImage = 'url("' + imgUrls[imgIndex] + '")';
+        imgIndex = (imgIndex + 1) % imgCount;
+      }
+
+      function buscarPeliculas() {
+        const input = document.getElementById('input');
+        const query = input.value.trim();
+        if (query) {
+          window.location.href = '/buscar?p=' + query;
+        }
+      }
+
+      document.getElementById('btn_enviar').addEventListener('click', () => {
+        const textoBusqueda = document.getElementById('input').value;
+        filtrarPeliculas(textoBusqueda);
+      });
+
+      document.getElementById('btn_enviar').addEventListener('click', buscarPeliculas);
+
+      setInterval(cambiarImagen, 5000);
+    });
+  </script>
+</body>
+</html>

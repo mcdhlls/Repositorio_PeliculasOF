@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            background-image: url('https://www.larocknpop.com/wp-content/uploads/2022/02/NETFLIX_123658.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: red;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Iniciar Sesión</h1>
+        <form action="/login" method="POST">
+            <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Usuario" required>
+            <br>
+            <input type="password" id="contraseña" name="contraseña" placeholder="Contraseña" required>
+            <br>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+        <p>¿Aún no tienes cuenta? <a href="registro">Regístrate</a></p>
+    </main>
+</body>
+</html>
